@@ -1,0 +1,55 @@
+import 'package:flutter/material.dart';
+void main() {
+  runApp( MyApp());
+}
+class MyApp extends StatelessWidget {
+  Widget build(BuildContext context){
+    return MaterialApp(
+      home: MyAppState(),
+    );
+  }
+}
+class MyAppState extends StatefulWidget{
+  MyAppStateCounter createState()=>MyAppStateCounter();
+}
+class MyAppStateCounter extends State<MyAppState>{
+  String msg="Double tap or swipe";
+  void changeMessageOnSwipe(DragUpdateDetails details){
+    setState(() {
+      if (details.delta.dx.abs() > details.delta.dy.abs()) {
+     if(details.delta.dx>0){
+     msg="swipe right";
+     }else if(details.delta.dx<0){
+       msg="swipe left";
+     }}else{ if(details.delta.dy>0){
+       msg="swipe down";
+     }else if(details.delta.dy<0){
+       msg="swipe up";
+     }
+    }
+    });
+  }
+  void msgDoubleTap(){
+    setState(() {
+      msg="double tap";
+    });
+  }
+  Widget build(BuildContext context){
+    return Scaffold(
+      appBar: AppBar(title: Center(child: Text("program 8 toogle",textAlign:TextAlign.center,style: TextStyle(fontSize: 50),)),backgroundColor: Colors.lightBlue,),
+      body: Center(
+        child: GestureDetector(
+          onDoubleTap: msgDoubleTap,
+          onPanUpdate: changeMessageOnSwipe,
+          child: Container(
+            width: 400,
+            height: 400,
+            color: Colors.cyan,
+            alignment: Alignment.center,
+            child:Text(msg,textAlign: TextAlign.center,)
+          ),
+        ),
+      )
+    );
+  }
+}
