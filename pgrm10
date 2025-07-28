@@ -1,0 +1,99 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Counter with Change List',
+      home: CounterPage(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class CounterPage extends StatefulWidget {
+  @override
+  _CounterPageState createState() => _CounterPageState();
+}
+
+class _CounterPageState extends State<CounterPage> {
+  int counter = 0;
+  List<String> changes = [];
+
+  void increment() {
+    setState(() {
+      counter++;
+      changes.insert(0, '+1'); // add latest change at the top
+    });
+  }
+
+  void decrement() {
+    setState(() {
+      counter--;
+      changes.insert(0, '-1');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Counter App with History'),
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(height: 40),
+          Text(
+            'Counter Value:',
+            style: TextStyle(fontSize: 24),
+          ),
+          SizedBox(height: 10),
+          Text(
+            '$counter',
+            style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: increment,
+                child: Text('Increment'),
+              ),
+              SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: decrement,
+                child: Text('Decrement'),
+              ),
+            ],
+          ),
+          SizedBox(height: 30),
+          // Divider(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Change List',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: changes.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text('Change: ${changes[index]}'),
+                );
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
