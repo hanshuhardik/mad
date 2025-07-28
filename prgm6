@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Display</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icons/icon-192x192.png" type="image/png">
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        td, th {
+            padding: 1em;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <center>
+        <h2> Stock Market Data Display</h2>
+        <div id="stock"></div>
+    </center>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log(" Service Worker registered:", reg.scope))
+                .catch(err => console.error(" Service Worker failed:", err));
+        }
+
+        fetch('data.json')
+            .then(res => res.json())
+            .then(stock => {
+                let table = "<table>";
+                table += "<tr><th>Company</th><th>Description</th><th>Initial Price</th><th>Price in 2007</th><th>Symbol</th></tr>";
+                for (let item of stock) {
+                    table += `<tr>
+                        <td>${item.company}</td>
+                        <td>${item.description}</td>
+                        <td>${item.initial_price}</td>
+                        <td>${item.price_2007}</td>
+                        <td>${item.symbol}</td>
+                    </tr>`;
+                }
+                table += "</table>";
+                document.getElementById("stock").innerHTML = table;
+            })
+            .catch(err => {
+                document.getElementById("stock").innerHTML = " Failed to load data.";
+                console.error(err);
+            });
+    </script>
+</body>
+</html>
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+data.json
+
+[
+  {
+    "company": "Tata Consultancy Services",
+    "description": "IT Services and Consulting",
+    "initial_price": "120",
+    "price_2007": "450",
+    "symbol": "TCS"
+  },
+  {
+    "company": "Infosys",
+    "description": "IT Services",
+    "initial_price": "90",
+    "price_2007": "390",
+    "symbol": "INFY"
+  },
+  {
+    "company": "Reliance Industries",
+    "description": "Oil and Telecom",
+    "initial_price": "150",
+    "price_2007": "700",
+    "symbol": "RELI"
+  }
+]
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+sw.js
+
+let cachesName="cache-v3";
+let asset=[
+    './',
+    './index.html',
+    './data.json',
+    './manifest.json',
+    './icons/icon-48x48.png'
+]
+self.addEventListener('install',event =>{
+    event.waitUntil(
+        caches.open(cachesName).then(cache => cache.addAll(asset))
+    );
+});
+
+self.addEventListener('activate',event=>{
+    event.waitUntil(
+        caches.keys().then(keys=>{
+            return Promise.all(
+                keys.map(existing =>{
+                    if(existing !== cachesName){
+                        return caches.delete(existing);
+                    }
+        })
+    );
+
+        })
+    );
+});
+
+self.addEventListener('fetch',event =>{
+    event.respondWith(
+        caches.match(event.request).then(response =>{
+            return response|| fetch(event.request);
+
+        })
+    );
+});
